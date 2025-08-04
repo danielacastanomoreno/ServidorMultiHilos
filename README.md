@@ -12,7 +12,7 @@
 * ```localhost:8050/profile.html```
 * ```localhost:8050/sunflower.jpg```
 * ```localhost:8050/dani.html``` (En este caso saldrá una página de error 404 Not Found).
-* Etc.
+* Puede buscar los recursos que desee sea observando los presentes en la carpeta ```resources``` del proyecto o cualquiero recurso que guste para verificar que funciona correctamente.
 4. Ir a la consola de ejecución de IntelliJ para observar más detalles sobre el comportamiento del servidor mientras usted realizaba todas las request anteriores.
 
 <br>
