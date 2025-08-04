@@ -16,7 +16,5 @@
 4. Ir a la consola de ejecución de IntelliJ para observar más detalles sobre el comportamiento del servidor mientras usted realizaba todas las request anteriores.
 
 <br>
-
-
   
 **¡Que lo disfrute profe!** 😊
