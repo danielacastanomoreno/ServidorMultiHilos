@@ -13,8 +13,7 @@
 * ```localhost:8050/sunflower.jpg```
 * ```localhost:8050/dani.html``` (En este caso saldrá una página de error 404 Not Found).
 * Etc.
-4. Ir a la consola de ejecución de IntelliJ para observar más detalles sobre el comportamiento del servidor mientras usted realizaba todas las request anteriores.
+4. Ir a la consola de ejecución de IntelliJ para observar más detalles sobre el comportamiento del servidor mientras usted realizaba todas las request anteriores. \\
 
-\\
 
 **¡Que lo disfrute profe!** 😊
