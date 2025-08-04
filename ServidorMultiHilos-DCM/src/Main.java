@@ -104,7 +104,6 @@ public class Main {
 
         String statusLine = null;
         String headerLine = null;
-        String bodyMessage = null;
         final String CRLF = "\r\n";
 
         var res = new File("resources/" + resource);
@@ -117,60 +116,87 @@ public class Main {
         statusLine = "200 OK";
         headerLine = "Content-type: " + contentType(resource) + CRLF;
 
+        if(res.exists()) {
 
-        if(res.exists() && contentType(resource).equals("text/html")) {
+            if (contentType(resource).equals("text/html")) {
 
-            // Envio linea de estado
-            writer.write("HTTP/1.0 " + statusLine + CRLF);
-            // Envio header
-            writer.write(headerLine);
-            // Envio el archivo
-            fis = new FileInputStream(res);
-            br = new BufferedReader(new InputStreamReader(fis));
 
-            String line;
-            var response = new StringBuilder();
-            while ((line = br.readLine()) != null) {
-                response.append(line);
+                // Envio linea de estado
+                writer.write("HTTP/1.0 " + statusLine + CRLF);
+                // Envio header
+                writer.write(headerLine);
+                // Envio el archivo
+                fis = new FileInputStream(res);
+                br = new BufferedReader(new InputStreamReader(fis));
+
+                String line;
+                var response = new StringBuilder();
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+
+                writer.write("Content-Length:" + response.length() + "\r\n");
+                writer.write("Connection: close\r\n");
+                writer.write("\r\n");
+                writer.write(response.toString());
+                writer.flush();
+
+                // Cerramos todos los recursos que teniamos abiertos
+                writer.close();
+                socket.close();
+
+                // Envio linea de estado
+                writer.write("HTTP/1.0 " + statusLine + CRLF);
+                // Envio header
+                writer.write(headerLine);
+                // Envio el archivo
+                fis = new FileInputStream(res);
+                br = new BufferedReader(new InputStreamReader(fis));
+
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+
+                writer.write("Content-Length:" + response.length() + "\r\n");
+                writer.write("Connection: close\r\n");
+                writer.write("\r\n");
+                writer.write(response.toString());
+                writer.flush();
+
+                // Cerramos todos los recursos que teniamos abiertos
+                writer.close();
+                socket.close();
+
             }
 
-            writer.write("Content-Length:" + response.length() + "\r\n");
-            writer.write("Connection: close\r\n");
-            writer.write("\r\n");
-            writer.write(response.toString());
-            writer.flush();
 
-            // Cerramos todos los recursos que teniamos abiertos
-            writer.close();
-            socket.close();
+            if (res.exists() && contentType(resource).equals("image/jpeg") || contentType(resource).equals("image/gif") || contentType(resource).equals("image/png")) {
 
-        }
+                var responseMetadata = new StringBuilder();
+                responseMetadata.append("HTTP/1.1 200 OK" + CRLF);
+                responseMetadata.append("Content-Type: " + contentType(resource));
 
-        else if(res.exists() && contentType(resource).equals("image/jpeg")) {
+                var fileStream = new FileInputStream(res);
 
-            var responseMetadata =  new StringBuilder();
-            responseMetadata.append("HTTP/1.1 200 OK" + CRLF);
-            responseMetadata.append("Content-Type: " + contentType(resource));
+                responseMetadata.append("Content-Length: " + fileStream.available() + CRLF);
+                responseMetadata.append(CRLF);
 
-            var fileStream = new FileInputStream(res);
+                var ouputStream = socket.getOutputStream();
+                ouputStream.write(responseMetadata.toString().getBytes(StandardCharsets.UTF_8));
 
-            responseMetadata.append("Content-Length: " + fileStream.available() + CRLF);
-            responseMetadata.append(CRLF);
+                try (fileStream) {
+                    fileStream.transferTo(ouputStream);
+                }
 
-            var ouputStream = socket.getOutputStream();
-            ouputStream.write(responseMetadata.toString().getBytes(StandardCharsets.UTF_8));
+                writer.flush();
 
-            try(fileStream) {
-                fileStream.transferTo(ouputStream);
+                // Cerramos todos los recursos que teniamos abiertos
+                writer.close();
+                socket.close();
+
+                System.out.println("Envio imagen");
             }
 
-            writer.flush();
-
-            // Cerramos todos los recursos que teniamos abiertos
-            writer.close();
-            socket.close();
-
-            System.out.println("Envio imagen");
         }
 
         else {
@@ -186,9 +212,6 @@ public class Main {
             while ((lineHtml = br.readLine()) != null) {
                 resposeNotFound.append(lineHtml);
             }
-
-            System.out.println("Respuesta: ");
-            System.out.println(resposeNotFound);
 
             writer.write("HTTP/1.0 404 NOT FOUND\r\n");
             writer.write("Content-Type: text/html\r\n");
