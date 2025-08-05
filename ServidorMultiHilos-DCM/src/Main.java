@@ -4,9 +4,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 
 
 public class Main {
@@ -120,7 +117,6 @@ public class Main {
 
             if (contentType(resource).equals("text/html")) {
 
-
                 // Envio linea de estado
                 writer.write("HTTP/1.0 " + statusLine + CRLF);
                 // Envio header
@@ -145,40 +141,17 @@ public class Main {
                 writer.close();
                 socket.close();
 
-                // Envio linea de estado
-                writer.write("HTTP/1.0 " + statusLine + CRLF);
-                // Envio header
-                writer.write(headerLine);
-                // Envio el archivo
-                fis = new FileInputStream(res);
-                br = new BufferedReader(new InputStreamReader(fis));
-
-                while ((line = br.readLine()) != null) {
-                    response.append(line);
-                }
-
-                writer.write("Content-Length:" + response.length() + "\r\n");
-                writer.write("Connection: close\r\n");
-                writer.write("\r\n");
-                writer.write(response.toString());
-                writer.flush();
-
-                // Cerramos todos los recursos que teniamos abiertos
-                writer.close();
-                socket.close();
-
             }
-
 
             if (res.exists() && contentType(resource).equals("image/jpeg") || contentType(resource).equals("image/gif") || contentType(resource).equals("image/png")) {
 
                 var responseMetadata = new StringBuilder();
                 responseMetadata.append("HTTP/1.1 200 OK" + CRLF);
-                responseMetadata.append("Content-Type: " + contentType(resource));
+                responseMetadata.append(String.format("Content-Type: %s\r\n", contentType(resource)));
 
                 var fileStream = new FileInputStream(res);
 
-                responseMetadata.append("Content-Length: " + fileStream.available() + CRLF);
+                responseMetadata.append(String.format("Content-Length: %d\r\n", fileStream.available()));
                 responseMetadata.append(CRLF);
 
                 var ouputStream = socket.getOutputStream();
@@ -186,11 +159,14 @@ public class Main {
 
                 try (fileStream) {
                     fileStream.transferTo(ouputStream);
+                    fileStream.read();
                 }
 
                 writer.flush();
 
                 // Cerramos todos los recursos que teniamos abiertos
+                fileStream.close();
+                ouputStream.close();
                 writer.close();
                 socket.close();
 
