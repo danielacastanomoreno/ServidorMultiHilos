@@ -145,6 +145,7 @@ public class Main {
 
             if (res.exists() && contentType(resource).equals("image/jpeg") || contentType(resource).equals("image/gif") || contentType(resource).equals("image/png")) {
 
+                // Manejo de todas los Content-Type: image/...
                 var responseMetadata = new StringBuilder();
                 responseMetadata.append("HTTP/1.1 200 OK" + CRLF);
                 responseMetadata.append(String.format("Content-Type: %s\r\n", contentType(resource)));
